@@ -26,7 +26,7 @@ program token.aleo {
     async constructor() {}
 
 
-    transition main(){}
+    transition dummy(){}
 
 
     /*
