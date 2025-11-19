@@ -14,7 +14,7 @@ TODO:
 
 ====================================================================================================================  
 */
-program token.aleo {
+program pedrogattai_workshop_token.aleo {
     mapping balances: address => u64;  // On-chain mapping between user addresses and public token balances
 
     record Token {
@@ -49,8 +49,16 @@ program token.aleo {
     */
 
     
-    //                                       CODE-ALONG DURING WORKSHOP
+    async transition mint_public (public recipient: address, amount: u64) -> Future {
+        let f: Future = workshop_ofac.aleo/address_check(recipient);
+        return mint_public_onchain(recipient, amount, f);
+    }
 
+    async function mint_public_onchain(recipient: address, amount: u64, addr_check: Future) {
+        addr_check.await();
+        let current_balance: u64 = balances.get_or_use(recipient, 0u64);
+        balances.set(recipient, current_balance + amount);
+    }
 
     /*
     ====================================================================================================================
@@ -70,18 +78,26 @@ program token.aleo {
     ====================================================================================================================  
     */
 
-    // async transition mint_private(
-    //     private recipient: address, 
-    //     private amount: u64
-    // ) -> (Token,Future) {
-    //     // TODO: Fill in here
+    async transition mint_private(
+        private recipient: address, 
+        private amount: u64
+    ) -> (Token,Future) {
+        // TODO: Fill in here
+    let new_token: Token = Token {
+        owner: recipient ,
+        amount: amount,
+    };
 
-    // }
-    // async function mint_private_onchain(
-    //     address_check : Future
-    // ){
-    //     // TODO: Fill in here
-    // }
+    let f: Future = workshop_ofac.aleo/address_check(recipient);
+
+    return (new_token, mint_private_onchain(f));
+    }
+
+    async function mint_private_onchain(
+        address_check : Future
+    ){
+    address_check.await();
+    }
 
     /*
     ====================================================================================================================
